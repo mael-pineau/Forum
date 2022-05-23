@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- web icon -->
+    <link rel="shortcut icon" type="image/png" href="../images/logos/web-icon.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js">
+
+
+    <!-- local css -->
+    <link rel="stylesheet" href="../css/Profil/profil.css" />
+    <link rel="stylesheet" href="../css/loader.css" />
+    <title>Profil de {{ concernedUser.username }}</title>
+</head>
+    <body>
+
+    <!-- header -->
+
+    <!-- if user is connected -->
+        {% if connectedUser != null %}
+            {% include '/header/header.html.twig' with {
+                "showSearchBar" : false,
+                }
+            %}
+        {% endif %}
+
+        <!-- if user is not connected -->
+        {% if connectedUser == null %}
+            {% include '/header/header.html.twig' with {
+                "showSearchBar" : false
+            }
+            %}
+        {% endif %}
+
+    <div class="container main-container rounded">
+
+        <!-- container of the profil -->
+        <div class="container profil-container rounded bg-white mt-5">
+
+            <!-- top part of the profil container -->
+            <div class="row">
+                <div class="col-md-12 profil-container">
+                    <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                        <div class="profile-pic">
+
+                            <!-- profil picture of the user -->
+                            <img src="../{{ getProfilPic(concernedUser.image) }}" id="output" width="200" />
+                        </div>
+                        <div style="margin-top: 110px">
+
+                            <!-- username of the user -->
+                            <span class="font-weight-bold title">{{ concernedUser.username }}</span>
+                        </div>
+                        <div>
+
+                            <!-- mail of the user -->
+                            <span class="text-black-50">{{ concernedUser.mail }}</span><span> </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- bottom part of the profil container -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex flex-column align-items-center text-center p-3 pb-5">
+
+                        <!-- numbers of posts of the user -->
+                        <h3> A posté : </h3>
+                        <p>{{ concernedUser.subjects|length }}</p>
+                        <i class="fa-solid fa-message fa-2xl" style="color: var(--light-blue)"></i>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex flex-column align-items-center text-center p-3 pb-5">
+
+                        <!-- number of comments of the user -->
+                        <h3> A posté : </h3>
+                        <p>{{ concernedUser.comments|length }}</p>
+                        <i class="fa-solid fa-comment fa-2xl" style="color: var(--light-blue)"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if connectedUser != null %}
+            {% if connectedUser.isAdmin == true and concernedUser.id != connectedUser.id %}
+                {% if success == 1 %}
+                    <p style="color: white">Action réussi. Cet utilisateur possède désormais le status d'administrateur</p>
+                {% elseif success == 2 %}
+                    <p style="color: white">Action réussi. Cet utilisateur désormais banni</p>
+                {% endif %}
+            <div class="d-flex align-items-center justify-content-between text-center p-3 pb-5" style="width: 75%">
+                {% if concernedUser.ban != null or concernedUser.isAdmin == true %}
+                    {% if concernedUser.ban != null %}
+                        <p class="card-text "style="color: white"><i class="fa-solid fa-circle-info"></i> Cet utilisteur est déja banni</p>
+                    {% elseif concernedUser.isAdmin == true %}
+                        <p class="card-text "style="color: white"><i class="fa-solid fa-circle-info"></i> Cet utilisateur est déja administrateur</p>
+                    {% endif %}
+                {% else %}
+                    <form action="/create-ban/{{ concernedUser.id }}" style="width: 50%">
+                        <input type="submit" style=" width: 100%" value="Bannir cet utilisateur" class="button-deban solid transparent" onclick="return displayAlert('Voulez vous vraiment bannir cet utilisateur ?')"/>
+                    </form>
+                    <form action="/make-user-admin/{{ concernedUser.id }}" style="width: 50%">
+                        <input type="submit" style="width: 100%" value="Mettre cet utilisateur administrateur" class="button solid transparent" onclick=" return displayAlert('Voulez vous mettre cet utilisateur avec le status administrateur ?')"/>
+                    </form>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        </div>
+
+        <div class="mt-5">
+            <h2 class="title" style="text-align: center; color: white">Sujets postés par {{ concernedUser.username }} : </h2>
+        </div>
+
+        <!-- container of posts of the user -->
+        <div class="container post">
+
+            <!-- check lengh of the subjects list -->
+            {% if concernedUser.subjects | length == 0 %}
+                <div class="mt-3 p-3 bg-white border">Cet utilisateur n'a posté aucun sujet de discussion</div>
+            {% else %}
+
+                <!-- for each subject -->
+                {% for subject in concernedUser.subjects %}
+
+                    <!-- link to the detailed subject page -->
+                    <div class="card mb-5 border-5 pt-2 active pb-0 px-3" onclick="window.location='/subject/'+{{ subject.id }};">
+                        <div class="card-body ">
+                            <div class="row">
+                                <div class="col-12">
+
+                                    <!-- subject title and description -->
+                                    <h4 class="card-title "><b>{{ subject.title }}</b></h4>
+
+                                    <!-- if subject is closed -->
+                                    {% if subject.isClosed == true%}
+                                        <p class="card-text text-muted small ">
+    {#                                        <img src="https://img.icons8.com/color/26/000000/christmas-star.png" class="mr-1 "#}
+    {#                                             width="19" height="19" id="star"> <span class="vl mr-2 ml-0"></span>#}
+                                            <i class="fa-solid fa-lock text-muted "></i> Sujet clos <span class="vl ml-1 mr-2 "></span>
+                                        </p>
+                                    {% endif %}
+                                    <h6 class="description">
+                                        {% autoescape false %}
+                                            {{ html_decode(subject.description) }}
+                                        {% endautoescape %} </h6>
+                                </div>
+                                <div class="col">
+                                    <h6 class=" post-profil-pic card-subtitle mb-2 text-muted d-flex">
+
+                                        <!-- display the author with the profil pic -->
+                                        <p class="card-text text-muted small " style="margin-top: 15px">
+                                            Posté par <span class="font-weight-bold"> <a href="/user-profil/19">{{ concernedUser.username }}</a></span></p>
+                                            <img src="../{{ getProfilPic(concernedUser.image) }}" id="output" width="10" />
+
+                                        <!-- get subject date to display -->
+
+                                        <!-- current date -->
+                                        {% set currentDate = date().timestamp %}
+
+                                        <!-- time between current date and subject date -->
+                                        {% set elapsedTime = currentDate - subject.date %}
+
+                                        <!-- call function to get the time to display (src/Twig/TwigFunctions.php) -->
+                                        {% set date = getElapsedTime(elapsedTime) %}
+
+                                        <p class="card-text text-muted small "style="margin-top: 15px">il y a {{ date }}</p>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- footer of the subject -->
+                        <div class="card-footer bg-white px-0 ">
+                            <div class="row">
+                                <div class=" col-md-auto ">
+
+                                    <!-- display numbers of comments posted on this subject -->
+                                    <div class="btn btn-outlined btn-black bg-transparent text-muted"
+                                         {% set subjectNbComments = subject.comments|length  %}
+                                       data-wow-delay="0.7s"><i class="fa-solid fa-comment fa-xl"></i> <small>{{ subjectNbComments }}</small></div>
+                                    <span class="vl ml-3"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+        </div>
+    </div>
+
+    <!-- footer -->
+    {% include '/footer/footer.html.twig' %}
+
+    <!-- javascript to make the profil pic change work -->
+    <script src="../js/Profil/profilEdit.js"></script>
+    </body>
+</html>

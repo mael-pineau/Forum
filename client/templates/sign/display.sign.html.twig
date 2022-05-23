@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- web icon -->
+    <link rel="shortcut icon" type="image/png" href="images/logos/web-icon.png">
+    <script
+            src="https://kit.fontawesome.com/64d58efce2.js"
+            crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="css/Sign/sign.css" />
+    <link rel="stylesheet" href="css/loader.css" />
+    <title>Connexion ou Inscription</title>
+</head>
+<body>
+
+    <div class="container {% if signUpDefault is defined %}sign-up-mode"{% endif %} id="Sign">
+        <div class="forms-container">
+
+            <!-- header -->
+            {% include '/header/header.sign.page.html.twig' %}
+
+            <!-- Sign in section -->
+            <div class="signin-signup">
+
+                <!-- call function displayLoader() when form is submitted -->
+                <form action="/sign-in" class="sign-in-form" method="POST" onsubmit="displayLoader()">
+
+                    <!-- sign-up success message -->
+                    {% if signUpSuccessMessage is defined %}
+                        <p class="success-message"> {{ signUpSuccessMessage }}</p>
+                    {% endif %}
+                    <h2 class="title">Connexion</h2>
+
+                    <!-- sign-in error message -->
+                    {% if signInError is defined %}
+                        <p class="error-message" id="error-message">
+                            {{ signInError }}
+                        </p>
+                    {% endif %}
+
+                    <!-- deban message -->
+                    {% if showFormDebanMessage is defined %}
+                        {% if showFormDebanMessage == true %}
+                            <p class="error-message" id="error-message">
+                                {{ formDebanMessage }}
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- show time until deban-->
+                    {% if showTimeUntilDeban is defined %}
+                        {% if showTimeUntilDeban == true %}
+                            <p class="error-message" id="error-message">
+                                Temps restant : {{ timeUntilDeban }}
+                            </p>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- show button to send a formDeban -->
+                    {% if showFormDebanButton is defined %}
+                        {% if showFormDebanButton == true %}
+                            <button type="button" class="button-deban solid" onclick="window.location='/create-formdeban/'+{{ userId }};">Envoyé un formulaire de réclamation</button>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- form inputs -->
+
+                    <!-- mail -->
+                    <div class="input-field">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email" name="sign-in-input-mail"
+                            required="required" minlength="2" maxlength="30"
+                            value="{% if signInInputedMail is defined %}{{signInInputedMail}}{% endif %}"
+                        />
+                    </div>
+
+                    <!-- password -->
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Mot de passe" name="sign-in-input-password"
+                            required="required" minlength="5" maxlength="30"
+                            value="{% if signInInputedPassword is defined %}{{signInInputedPassword}}{% endif %}"
+                        />
+                    </div>
+
+                    <input type="submit" id="sign-in-form-button" value="Se connecter" class="button solid" />
+                </form>
+
+                <!-- Sign up section -->
+
+                <!-- call function displayLoader() when form is submitted -->
+                <form action="sign-up" class="sign-up-form" method="POST" onsubmit="displayLoader()">
+                    <h2 class="title">Inscription</h2>
+
+                    <!-- sign-up error message -->
+                    {% if signUpError is defined %}
+                        <p class="error-message" id="error-message">
+                            {{ signUpError }}
+                        </p>
+                    {% endif %}
+
+                    <!-- form inputs -->
+
+                    <!-- mail -->
+                    <div class="input-field">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="Email" name="sign-up-input-mail" required="required"
+                            minlength="2" maxlength="30"
+                            value="{% if signUpInputedMail is defined %}{{signUpInputedMail}}{% endif %}"
+                        />
+                    </div>
+
+                    <!-- username -->
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        <input type="text" placeholder="Pseudo" name="sign-up-input-username" required="required"
+                            minlength="2" maxlength="20"
+                            value="{% if signUpInputedUsername is defined %}{{signUpInputedUsername}}{% endif %}"
+                        />
+                    </div>
+
+                    <!-- password -->
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Mot de passe" name="sign-up-input-password" required="required"
+                            minlength="3" maxlength="30"
+                            value="{% if signUpInputedPassword is defined %}{{signUpInputedPassword}}{% endif %}"
+                        />
+                    </div>
+
+                    <!-- confirm password -->
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Confirmation du mot de passe"
+                            name="sign-up-input-password-confirm" required="required"
+                            minlength="3" maxlength="30"/>
+                    </div>
+                    <input type="submit" id="sign-up-form-button" class="button" value="S'inscrire" />
+                </form>
+            </div>
+        </div>
+
+        <!-- display -->
+        <div class="panels-container">
+            <div class="panel left-panel">
+                <div class="content">
+                    <h3>Tu n'as pas encore de compte ?</h3>
+                    <p>
+                        Crée un compte afin de pouvoir participer au nombreuses discussions du forum!
+                    </p>
+                    <button class="button transparent" id="sign-up-button">
+                        S'inscrire
+                    </button>
+                </div>
+            </div>
+            <div class="panel right-panel">
+                <div class="content">
+                    <h3>Déja parmis nous ?</h3>
+                    <p>
+                        Connecte toi et retrouve toute tes discussions favorites !
+                    </p>
+                    <button class="button transparent" id="sign-in-button">
+                        Connexion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- javascript to make animations transitions when clicking on button -->
+    <script src="js/Sign/sign.js"></script>
+
+    </body>
+</html>

@@ -1,0 +1,76 @@
+# Body of POST and PUT requests to make to the api :
+
+//User
+The body for the route api/user in POST need to be in the following form : 
+
+{
+    "mail" : "yourMail",
+    "username" : "yourUsername",
+    "password" : "yourHashedPassword",
+}
+
+The body for the route api/user in UPDATE need to be in the following form : 
+
+{
+    "mail" : "yourMail",
+    "username" : "yourUsername",
+    "password" : "yourHashedPassword",
+    "image" : "yourImageName.jpeg",
+    "is_admin" : false
+}
+
+//Subject
+The body for the route api/subject in POST need to be in the following form : 
+
+{
+    "title" : "yourSubjectTitle",
+    "description" : "yourSubjectDescription",
+    "userId" : idOfUserAuthor
+}
+
+The body for the route api/subject in PUT need to be in the following form : 
+
+{
+    "title" : "yourSubjectTitle",
+    "description" : "yourSubjectDescription",
+    "is_closed" : false
+}
+
+//Comment
+The body for the route api/comment in POST need to be in the following form : 
+
+{
+    "message" : "yourCommentMessage",
+    "userId" : idOfUserAuthor,
+    "subjectId" : idOfLinkedSubject
+}
+
+The body for the route api/comment in PUT need to be in the following form : 
+
+{
+    "message" : "yourNewMessage",
+}
+
+//Ban
+The body for the route api/ban in POST need to be in the following form : 
+
+{
+    "is_permanent" : false,
+    "reason" : "yourReasonToBan",
+    "dateDeban" : timsestampOfWhenUserWillBeDebanned,
+    "userId" : idOfUserToBan
+}
+
+//FormDeban
+The body for the route api/formDeban in POST need to be in the following form : 
+
+{
+    "message" : "yourDebanMessage",
+    "userId" : idOfUserBanned
+}
+
+The body for the route api/formDeban in PUT need to be in the following form : 
+
+{
+    "is_refused" : true
+}

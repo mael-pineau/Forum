@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- web icon -->
+    <link rel="shortcut icon" type="image/png" href="../images/logos/web-icon.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!-- local css -->
+    <link rel="stylesheet" href="../css/Subject/subject.css" />
+    <link rel="stylesheet" href="../css/loader.css" />
+
+    <!-- trix -->
+    <link rel="stylesheet" type="text/css" href="../css/trix/trix.css">
+    <script type="text/javascript" src="../js/trix/trix.js"></script>
+
+    <title>Modification d'un sujet de discussion</title>
+</head>
+<body>
+
+<!-- header -->
+{% include '/header/header.html.twig' with {
+    "showSearchBar" : false
+}
+%}
+
+<div class="container main-container rounded">
+
+    <!-- container of posts of the user -->
+    <form action="/update-comment/{{ concernedComment.id }}"
+          method="POST"
+          class="container post"
+          onsubmit="return countTrixCharacters();">
+
+
+        <div class="card mb-1 border-5 pt-2 active pb-0 px-3 mt-5">
+            <div class="card-body ">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center experience">
+                            <h3 style="font-size: 25px">Modifier votre commentaire</h3>
+                        </div>
+
+                        <input id="x" type="hidden" name="content" required="required" minlength="20" value="
+                                    {{ html_decode(concernedComment.message) }}">
+                        <trix-editor input="x"></trix-editor>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <input type="submit" class="button transparent" value="Modifier" style="width: 25%">
+                            <input name="subjectId" type="number" hidden="hidden" value="{{ concernedSubject.id }}">
+                            <button type="button" class="button transparent disabled" onclick="window.location='/subject/{{ concernedSubject.id }}'" style="width: 25%;">
+                                annuler
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- footer -->
+{% include '/footer/footer.html.twig' %}
+
+<!-- javascript to make make an alert appear when clicking on a button -->
+<script src="../js/Subject/subject.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+#Explication projet Forum
+
+#Introduction
+Ce fichier à pour but de détailler comment réaliser toutes les fonctionnalites qui sont nécessaires à l'utilisation de Symfony et Doctrine, ainsi que comment résoudre les problèmes les plus communs, ainsi que de donner accès au commandes les plus communes et nécessaires.
+
+---------------------- Installation et mise en place ------------------------
+
+#Dependences
+
+Si le projet vient d'etre cloné, il est necessaire d'installer toute les dependences (librairies) avec la commande "composer install" dans le dossier "api", puis dans le dossier "client"
+
+#Base de données 
+
+Pour générer une nouvelle base de donnée lié au projet, il suffit de modifier le fichier .Env dèja présent avec les information de la base (user / mdp / bdd_nom)
+
+Puis pour crée la base de donnée automatiquement sur PhpMyAdmin, il faut lancer la commande "php bin/console doctrine:database:create"
+
+#Migrations
+
+Les migrations représentent des fichiers SQL comportant les différentes modifications apportées à la bdd au fur et à mesure en faisant des migrations.
+Quand on récupère le projet, les modifications à appliqué ne sont pas les même car la structure de la base n'existe même pas.
+Pour résoudre cela il est nécessaire de supprimer tout les fichiers migrations, ainsi que les différentes migrations de la table migrations de la base
+
+Une fois que c'est fait il faut crée une migration avec une nouvelle modification de structure qui va correspondre a ceux des fichier de doctrine actuel.
+Il faut donc faire les commandes suivantes : "php bin/console make:migration" puis "php bin/console doctrine:migrations:migrate" afin d'obtenir la structure de la base à jour. 
+Attention la base de donnée sera vide.
+
+---------------------- Choses à suivres ------------------------
+
+#Ports
+
+L'adresse de l'api est définie par "localhost:8000" dans le client, il est préferable de ne pas y changer
+L'adresse du client peut être sur nimporte quel port.
+
+#Requetes à l'api
+
+Lorsque l'on envoie des paramètres à l'api, on doit les envoyé sous forme JSON, et les bons champs doivent être envoyé à l'api
+Une liste complete de ces format JSON à suivre sont disponible dans le fichier apiParameters.txt
+
+#URL
+
+Lorsque l'on appelle une URL, cela va appeller le controlelr correspondant à cette URL.
+
+On peut voir les toute les routes en lancant la commande : "php bin/console debug:router"
+
+---------------------- Lancement des serveurs ------------------------
+
+#Lancement des serveurs
+
+!Attention! Les deux commandes sont différentes (problème d'adresse mail dans l'url avec un "." qui ne fonctionne pas sinon)
+
+Commande pour lancer l'api : php -S 0.0.0.0:8000 public/index.php
+Commande pour lancer le client : php -S 0.0.0.0:9000 -t public/
+Mamp / Wamp... doit être en cours de fonctionnemment
+
+---------------------- Doctrine ------------------------
+
+#Entity
+
+Les entités représent les table de ta base de données.
+
+Le dossier entity contient les différent fichier correspondant à chacune de tes tables, mais ces fichiers contiennent aussi directement les liaison entre les entités.
+
+#Console pour crée des entités
+
+Les entités peuvent être créé à partir de la console.
+ATTENTION :
+La console n'est qu'un outil qui va générer un fichier Entity ainsi que son Repository, Les modifications peuvent être apportées DIRECTEMENT AU FICHIERS.
+La console n'est qu'un outil graphique qui va générer et modifier les fichiers indirectement.
+
+=> Il n'est donc absolument pas NECESSAIRE d'utiliser la console pour chaque modification que tu veux apporter à des tables ou relations
+Pour cela, tu peux modifier directement les fichiers Entity que tu souhaite afin d'apporter les modifications
+
+---------------------- Ressources ------------------------
+
+#Lien des ressources assets trouvé sur internet
+
+Police du logo et de l'icone : https://www.fontspace.com/android-7-font-f20034
+Template de la page d'acceuil original : https://bulmatemplates.github.io/bulma-templates/
+Template de la page de modification du profil : https://bbbootstrap.com/snippets/bootstrap-5-myprofile-90806631# (alt : https://bbbootstrap.com/snippets/social-profile-container-63944396)
+Template de la page 404 : https://codepen.io/THEORLAN2/pen/zqOLXQ
+Template pour le design es posts et des commentaires : https://bbbootstrap.com/snippets/single-listing-of-items-profiles-81642019
+
+#Documentation
+
+Le mieux reste de chercher la documentation officiel de symfony qui est trés complete
+https://symfony.com/doc/current/controller.html#controller

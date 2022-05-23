@@ -1,0 +1,61 @@
+<!-- navbar -->
+
+<!-- logo -->
+<div class="navBar d-flex justify-content-between align-items-center">
+    <div class="logo m-top d-flex justify-content-start align-items-center" style="width: 33%; margin-left: 10px">
+        <p onclick="window.location='/'">FORUMFOREACH</p>
+    </div>
+
+    <!-- search bar -->
+    {% if showSearchBar == true %}
+        <form onsubmit="window.location='/?search='+(this.value)" method="GET" class="search m-top d-flex justify-content-center align-items-center" style="width: 33%">
+            <div class="input">
+                <input name="search" class="input" type="text" value="{% if searchedWords is defined %}{{ searchedWords }}{% endif %}" placeholder="Rechercher des sujets" style="width: 300px; text-align: center">
+            </div>
+            <div class="input">
+                <button class="submit" type="submit">Q</button>
+            </div>
+        </form>
+    {% endif %}
+
+    {% if connectedUser != null %}
+    <div class="dropdown  m-top m-right d-flex justify-content-end align-items-center" style="width: 33%">
+        <button class="dropbtn profil-pic">
+            <img src="../{{ getProfilPic(connectedUser.image) }}" id="output" width="50" />
+            <div class="dropdown-content">
+                <a href="/edit-profil">Modifier mon profil</a>
+                <a href="/user-profil/{{ connectedUser.id }}">Voir mon profil</a>
+                {% if connectedUser.isAdmin == true %}
+                    <a href="/formdebans">Consulter les demande de debans</a>
+                {% endif %}
+                <a href="/sign-out">Se déconnecter</a>
+            </div>
+        </button>
+    </div>
+    {% else %}
+
+    <!-- sign button -->
+    <form action="/sign" class="search m-top d-flex justify-content-end align-items-center" style="width: 33%; margin-right: 10px">
+        <input type="submit" value="Se connecter / s'inscrire" class="button transparent" style="width: 60%"/>
+    </form>
+    {% endif %}
+
+</div>
+
+{% if showAdditionalOption is defined %}
+<div class="navBar d-flex justify-content-end align-items-center">
+    <div>
+        <select onchange="window.location='/?sortCriteria='+(this.value)" name="cars" id="cars">
+            <option {% if selectedOption == "mostRecents" %} selected="selected" {% endif %} value="mostRecents">Les plus récents</option>
+            <option {% if selectedOption == "oldests" %} selected="selected" {% endif %} value="oldests">Les plus anciens</option>
+            <option {% if selectedOption == "mostComments" %} selected="selected" {% endif %} value="mostComments">Avec le plus de commentaires</option>
+            <option {% if selectedOption == "leastComments" %} selected="selected" {% endif %} value="leastComments">Avec le moins de commentaires</option>
+        </select>
+    </div>
+    {% if connectedUser != null %}
+        <form action="/create-subject/" class="search m-top d-flex justify-content-end align-items-center" style="width: 33%; margin-right: 10px">
+            <input type="submit" value="écrire un sujet" class="button transparent" style="width: 60%"/>
+        </form>
+    {% endif %}
+</div>
+{% endif %}

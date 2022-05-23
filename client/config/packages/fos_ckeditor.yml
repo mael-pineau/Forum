@@ -1,0 +1,8 @@
+twig:
+  #...
+  fos_ck_editor:
+  configs:
+  my_config:
+  language: fr
+  uiColor:                "#000000"
+  toolbar: [ ["Source", "-", "Save"], "/", ["Anchor"], "/", ["Maximize"] ]

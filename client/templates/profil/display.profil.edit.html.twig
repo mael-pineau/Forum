@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- web icon -->
+    <link rel="shortcut icon" type="image/png" href="images/logos/web-icon.png">
+    <script
+            src="https://kit.fontawesome.com/64d58efce2.js"
+            crossorigin="anonymous"
+    ></script>
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+            crossorigin="anonymous"
+    ></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js">
+
+    <!-- local css -->
+    <link rel="stylesheet" href="css/Profil/profilEdit.css" />
+    <link rel="stylesheet" href="css/loader.css" />
+    <title>Votre profil</title>
+</head>
+    <body>
+
+    <!-- header -->
+
+    {% include '/header/header.html.twig' with {
+        "showSearchBar" : false
+        }
+    %}
+
+    <div class="container rounded bg-white mt-5 mb-5">
+        <div class="row">
+            <div class="d-flex flex-column align-items-center text-center p-3 p-5 border-bottom">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="title">Paramètres du profil</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- error and success messages -->
+        {% if editProfilPictureErrorMessage is defined %}<p class="error-message">{{ editProfilPictureErrorMessage }}</p>{% endif %}
+        {% if editProfilPictureSuccessMessage is defined %}<p class="success-message">{{ editProfilPictureSuccessMessage }}</p>{% endif %}
+
+        {% if editProfilUsernameErrorMessage is defined %}<p class="error-message">{{ editProfilUsernameErrorMessage }}</p>{% endif %}
+        {% if editProfilUsernameSuccessMessage is defined %}<p class="success-message">{{ editProfilUsernameSuccessMessage }}</p>{% endif %}
+
+        {% if editProfilPasswordErrorMessage is defined %}<p class="error-message">{{ editProfilPasswordErrorMessage }}</p>{% endif %}
+        {% if editProfilPasswordSuccessMessage is defined %}<p class="success-message">{{ editProfilPasswordSuccessMessage }}</p>{% endif %}
+
+        <div class="row">
+            <div class="col-md-4 border-right">
+
+                <!-- form to change your image -->
+                <form class="d-flex flex-column align-items-center text-center p-3 py-5"
+                action="/edit-profil-picture" method="POST" enctype="multipart/form-data" onsubmit="displayLoader()">
+                    <div class="profile-pic">
+                        <label class="-label" for="file">
+                            <span class="glyphicon glyphicon-camera"></span>
+                            <span>Changer d'image</span>
+                        </label>
+
+                        <!-- form inputs -->
+
+                        <!-- image -->
+                        <input name="input-profil-picture" id="file" type="file" onchange="loadFile(event)"/>
+                        <img src="{{ getProfilPic(connectedUser.image) }}" id="output-profil" width="200" />
+                    </div>
+                    <div style="margin-top: 10px">
+                        <span class="font-weight-bold">{{ connectedUser.username }}</span>
+                    </div>
+                    <div>
+                        <span class="text-black-50">{{ connectedUser.mail }}</span><span> </span>
+                    </div>
+
+                    <!-- submit -->
+                    <div class="mt-5 text-center">
+                        <input class="button" type="submit" value="Modifier"/>
+                    </div>
+                </form>
+            </div>
+
+            <!-- form to change your username -->
+            <div class="col-md-4 border-right">
+                <form class="p-3 py-5" action="/edit-profil-username" method="POST" onsubmit="displayLoader()">
+                    <div class="d-flex justify-content-between align-items-center experience">
+                        <h3>Changer son pseudo</h3>
+                    </div>
+                    <!-- form inputs -->
+
+                    <!-- username -->
+                    <div class="row mt-2">
+                        <div class="input-field">
+                            <i class="fas fa-user"></i>
+                            <input type="text" placeholder="Pseudo" name="input-username" required="required"
+                                   minlength="2" maxlength="20"
+                                   value="{{ connectedUser.username }}"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- submit -->
+                    <div class="mt-5 text-center">
+                        <input class="button" type="submit" value="Modifier"/>
+                    </div>
+                </form>
+                <form action="/delete-user/{{ connectedUser.id }}" class="p-3 py-5" method="POST" onsubmit="return displayAlert('Attention, vous êtes sur le point de supprimer votre compte. Cet action est irréversible. Voulez vous réelement supprimer votre compte ? (Vos subjets et commentaires serons conservées mais anonymisées.)')">
+                    <div class="mt-5 text-center">
+                        <input class="button-deban" style="width: 100%" type="submit" value="Supprimer mon compte"/>
+                    </div>
+                </form>
+            </div>
+
+            <!-- form to change your password -->
+            <form class="col-md-4" action="/edit-profil-password" method="POST" onsubmit="displayLoader()">
+                <div class="p-3 py-5">
+                    <div class="d-flex justify-content-between align-items-center experience">
+                        <h3>Changer son mot de passe</h3>
+                    </div>
+                    <br>
+
+                    <!-- form inputs -->
+
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+
+                        <!-- current password -->
+                        <input type="password" placeholder="Mot de passe actuel" name="input-password"
+                                required="required" minlength="5" maxlength="30"
+                                value="{% if inputedPassword is defined %}{{ inputedPassword }}{% endif %}"
+                        />
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+
+                        <!-- new password -->
+                        <input type="password" placeholder="Nouveau mot de passe" name="input-new-password"
+                               required="required" minlength="5" maxlength="30"
+                               value="{% if inputedNewPassword is defined %}{{ inputedNewPassword }}{% endif %}"
+                        />
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+
+                        <!-- confirm new password -->
+                        <input type="password" placeholder="Confirmation du nouveau mot de passe" name="input-new-password-confirm"
+                               required="required" minlength="5" maxlength="30"
+                        />
+                    </div>
+
+                    <!-- submit -->
+                    <div class="mt-5 text-center">
+                        <input class="button" type="submit" value="Modifier"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- footer -->
+    {% include '/footer/footer.html.twig' %}
+
+    <!-- javascript to make the profil pic change work -->
+    <script src="js/Profil/profilEdit.js"></script>
+    </body>
+</html>

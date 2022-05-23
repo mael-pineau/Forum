@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- web icon -->
+    <link rel="shortcut icon" type="image/png" href="../images/logos/web-icon.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-alpha1/dist/js/bootstrap.bundle.min.js">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!-- local css -->
+    <link rel="stylesheet" href="../css/Subject/subject.css" />
+    <link rel="stylesheet" href="../css/loader.css" />
+
+    <!-- trix -->
+    <link rel="stylesheet" type="text/css" href="../css/trix/trix.css">
+    <script type="text/javascript" src="../js/trix/trix.js"></script>
+
+    <title>{{ concernedSubject.title }}</title>
+</head>
+<body>
+
+<!-- header -->
+
+<!-- if user is connected -->
+    {% if connectedUser != null %}
+        {% include '/header/header.html.twig' with {
+            "showSearchBar" : false
+            }
+        %}
+    {% endif %}
+
+    <!-- if user is not connected -->
+    {% if connectedUser == null %}
+        {% include '/header/header.html.twig' with {
+            "showSearchBar" : false
+        }
+        %}
+    {% endif %}
+
+<!-- check if subject author have a deleted account -->
+{% if concernedSubject.user == null %}
+
+    <!-- if yes, change user values -->
+    {% set user = {
+        id : 404, username : "Deleted User", image : "images/profil-pictures/default.png"
+    }
+    %}
+
+    <!-- change comment.user value -->
+    {% set concernedSubject = concernedSubject|merge({'user' : (user)}) %}
+
+{% endif %}
+
+
+<div class="container main-container rounded">
+
+    <!-- container of posts of the user -->
+    <div class="container post">
+        <!-- link to the detailed subject page -->
+        <div class="card mb-1 border-5 pt-2 active pb-0 px-3 mt-5">
+            <div class="card-body ">
+                <div class="row">
+                    <div class="col-12">
+
+                        <!-- subject title and description -->
+                        <h4 class="card-title "><b>{{ concernedSubject.title }}</b></h4>
+
+                        <!-- if subject is closed -->
+                        {% if concernedSubject.isClosed == true %}
+                            <p class="card-text text-muted small ">
+                                {#                                        <img src="https://img.icons8.com/color/26/000000/christmas-star.png" class="mr-1 "#}
+                                {#                                             width="19" height="19" id="star"> <span class="vl mr-2 ml-0"></span>#}
+                                <i class="fa-solid fa-lock text-muted "></i> Sujet clos <span class="vl ml-1 mr-2 "></span>
+                            </p>
+                        {% endif %}
+                        <h6 class="description">
+                            <p>{% autoescape false %}
+                                    {{ html_decode(concernedSubject.description) }}
+                                {% endautoescape %}</p> </h6>
+                    </div>
+                    <div class="col">
+                        <h6 class=" post-profil-pic card-subtitle mb-2 text-muted d-flex">
+
+                            <!-- display the author with the profil pic -->
+                            <p class="card-text text-muted small " style="margin-top: 15px">
+                                Posté par <span class="font-weight-bold"> <a href="/user-profil/{{ concernedSubject.user.id }}">{{ concernedSubject.user.username }}</a></span></p>
+                            <img src="../{{ getProfilPic(concernedSubject.user.image) }}" id="output" width="10" />
+
+                            <!-- get subject date to display -->
+
+                            <!-- current date -->
+                            {% set currentDate = date().timestamp %}
+
+                            <!-- time between current date and subject date -->
+                            {% set elapsedTime = currentDate - concernedSubject.date %}
+
+                            <!-- call function to get the time to display (src/Twig/TwigFunctions.php) -->
+                            {% set timeElapsed = getElapsedTime(elapsedTime) %}
+
+                            <p class="card-text text-muted small "style="margin-top: 15px">il y a {{ timeElapsed }}</p>
+                        </h6>
+                    </div>
+                </div>
+            </div>
+
+            <!-- footer of the subject -->
+            <div class="card-footer bg-white px-0 ">
+                <div class="row">
+                    <div class=" col-md-auto ">
+
+                        <!-- display numbers of comments posted on this subject -->
+                        <div class="btn btn-outlined btn-black bg-transparent text-muted"
+                                {% set subjectNbComments = concernedSubject.comments|length  %}
+                             data-wow-delay="0.7s"><i class="fa-solid fa-comment fa-xl"></i> <small>{{ subjectNbComments }}</small></div>
+                        <span class="vl ml-3"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- display options if necessary -->
+
+                {% if (connectedUser != null and (connectedUser.id == concernedSubject.user.id or connectedUser.isAdmin == true or concernedSubject.isClosed == true) or (connectedUser == null)) %}
+                    <div class="card mb-2 border-5 pt-0 active pb-0 px-3 options">
+                        <div class="card-body ">
+                            <div class="row">
+                                <div class="col-12 d-flex justify-content-between align-items-center">
+
+                                    <!-- if connected user is the author of the subject -->
+                                    {% if connectedUser != null %}
+                                        {% if connectedUser.id == concernedSubject.user.id %}
+
+                                            {% if concernedSubject.isClosed == false %}
+                                                <!-- button to edit the subject -->
+                                                <button class="button transparent disabled" onclick="window.location='/edit-subject/'+{{ concernedSubject.id }}; displayLoader()" style="width: 25%;">
+                                                    Modifier mon sujet
+                                                </button>
+                                            {% endif %}
+
+                                            <!-- button to delete the subject -->
+                                            <form action="/delete-subject/{{ concernedSubject.id }}"
+                                                  method="POST"
+                                                  onsubmit="return displayAlert('Voulez vous vraiment supprimer votre sujet ?')" style="width: 25%">
+
+                                                <input type="submit" value="Supprimer mon sujet" class="button-deban transparent" style="width: 100%"/>
+                                            </form>
+
+                                        {% if connectedUser.isAdmin == true %}
+                                            <!-- if subject isn't already closed -->
+                                            {% if concernedSubject.isClosed == false %}
+                                                <form action="/close-subject/{{ concernedSubject.id }}"
+                                                      method="POST"
+                                                      onsubmit="return displayAlert('Voulez vous vraiment clore votre sujet ?')" style="width: 25%">
+                                                    <input value="Clore le sujet" type="submit" class="button-deban transparent" style="width: 100%"/>
+                                                </form>
+
+                                                <!-- if subject is already closed -->
+                                            {% else %}
+                                                <form action="/open-subject/{{ concernedSubject.id }}"
+                                                      method="POST"
+                                                      onsubmit="return displayAlert('Voulez vous vraiment ré-ouvrir votre sujet ?')" style="width: 25%">
+                                                    <input value="Ré-ouvrir le sujet" type="submit" class="button-deban transparent" style="width: 100%"/>
+                                                </form>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        {% else %}
+
+                                            <!-- if conencted user is admin -->
+                                            {% if connectedUser.isAdmin == true %}
+
+                                                <!-- if subject isn't already closed -->
+                                                {% if concernedSubject.isClosed == false %}
+                                                    <form action="/close-subject/{{ concernedSubject.id }}"
+                                                          method="POST"
+                                                          onsubmit="return displayAlert('Voulez vous vraiment clore ce sujet ?')" style="width: 25%">
+                                                        <input value="Clore le sujet" type="submit" class="button-deban transparent" style="width: 100%"/>
+                                                    </form>
+
+                                                <!-- if subject is already closed -->
+                                                {% else %}
+                                                    <form action="/open-subject/{{ concernedSubject.id }}"
+                                                          method="POST"
+                                                          onsubmit="return displayAlert('Voulez vous vraiment ré-ouvrir ce sujet ?')" style="width: 25%">
+                                                        <input value="Ré-ouvrir le sujet" type="submit" class="button-deban transparent" style="width: 100%"/>
+                                                    </form>
+                                                {% endif %}
+
+                                                <!-- button to delete the subject -->
+                                                <form action="/delete-subject/{{ concernedSubject.id }}"
+                                                      method="POST"
+                                                      onsubmit="return displayAlert('Voulez vous vraiment supprimer ce sujet ?')" style="width: 25%">
+                                                    <input type="submit" value="Supprimer le sujet" class="button-deban transparent" style="width: 100%"/>
+                                                </form>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+
+                                    <!-- user isn't logged-in -->
+                                    {% if connectedUser == null %}
+                                        <p class="card-text "style="color: white"><i class="fa-solid fa-circle-info"></i> Connectez vous pour pouvoir ajouter un commentaire!</p>
+            {#                        {% else %}#}
+            {#                            <button class="button transparent disabled" style="width: 25%;">#}
+            {#                                Ajouter un commentaire#}
+            {#                            </button>#}
+
+                                        <!-- if subject is closed -->
+                                        {% elseif concernedSubject.isClosed == true %}
+                                            <p class="card-text "style="color: white"><i class="fa-solid fa-circle-info"></i> Ce sujet est clos, vous ne pouvez pas y repondre</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+
+        <!-- comments -->
+
+        <!-- check lengh of the comment list -->
+        {% if concernedSubject.comments | length == 0 %}
+            <div class="mt-3 p-3 bg-white border" style="width: 100%">Aucun commentaire n'a encore été posté</div>
+        {% else %}
+
+            <!-- foreach comment -->
+            {% for comment in concernedSubject.comments %}
+
+                <!-- check if comment author have a deleted account -->
+                {% if comment.user == null %}
+
+                    <!-- if yes, change user values -->
+                    {% set user = {
+                        id : 404, username : "Deleted User", image : "images/profil-pictures/default.png"
+                        }
+                    %}
+
+                    <!-- change comment.user value -->
+                    {% set comment = comment|merge({'user' : (user)}) %}
+
+                {% endif %}
+
+            <div class="comment card border-5 pt-2 mt-5 active pb-0 px-3">
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-12">
+
+                            <!-- comment message -->
+                            <h6 class="description">
+                                {% autoescape false %}
+                                    {{ html_decode(comment.message) }}
+                                {% endautoescape %}</h6>
+                        </div>
+                        <div class="col">
+                            <h6 class=" post-profil-pic card-subtitle mb-2 text-muted d-flex">
+
+                                <!-- display the author name and link to his profil -->
+                                <p class="card-text text-muted small " style="margin-top: 15px">
+                                    Posté par <span class="font-weight-bold"> <a href="/user-profil/{{ comment.user.id }}">{{ comment.user.username }}</a></span></p>
+
+                                <!-- get comment user profil pic to display -->
+                                {% set userprofilPicturePath = getProfilPic(comment.user.image) %}
+                                <img src="../{{ userprofilPicturePath }}" id="output" width="10" />
+
+                                <!-- get comment date to display -->
+
+                                <!-- current date -->
+                                {% set currentDate = date().timestamp %}
+
+                                <!-- time between current date and subject date -->
+                                {% set elapsedTime = currentDate - comment.date %}
+
+                                <!-- call function to get the time to display (src/Twig/TwigFunctions.php) -->
+                                {% set date = getElapsedTime(elapsedTime) %}
+
+                                <p class="card-text text-muted small "style="margin-top: 15px">il y a {{ date }}</p>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- comment options -->
+
+                <!-- if the connected user is the one who posted the comment -->
+                {% if connectedUser != null %}
+                    {% if connectedUser.id == comment.user.id %}
+                        <div class="col-12 d-flex justify-content-between align-items-center card-footer">
+                            <button class="button transparent disabled" onclick="window.location='/edit-comment/'+{{ comment.id }}; displayLoader()" style="width: 25%;">
+                                Modifier mon commentaire
+                            </button>
+                            <form action="/delete-comment/{{ comment.id }}"
+                                  method="POST"
+                                  onsubmit="return displayAlert('Voulez vous vraiment supprimer votre commentaire ?')"
+                            style="width: 25%">
+
+                                <input type="number" value="{{ concernedSubject.id }}" name="subjectId" hidden="hidden">
+                                <input type="submit" class="button-deban transparent" value="Supprimer mon commentaire" style="width: 100%"/>
+                            </form>
+                        </div>
+                    {% else %}
+
+                        <!-- if the connected user is admin -->
+                        {% if connectedUser.isAdmin == true %}
+                            <form action="/delete-comment/{{ comment.id }}"
+                                  method="POST"
+                                  onsubmit="return displayAlert('Voulez vous vraiment supprimer ce commentaire ?')"
+                                  class="col-12 d-flex justify-content-between align-items-center card-footer">
+
+                                <input type="number" value="{{ concernedSubject.id }}" name="subjectId" hidden="hidden">
+
+                                <input type="submit" class="button-deban transparent" value="Supprimer le commentaire" style="width: 25%"/>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- show possibility to add a comment if subject is not closed and if user is signed in -->
+        {% if (concernedSubject.isClosed == false) and (connectedUser != null) %}
+
+            <!-- trix -->
+            <form class="card mb-1 border-5 pt-2 active pb-0 px-3 mt-5" style="width: 90%" action="/create-comment"
+                  method="POST"
+                  onsubmit="return countTrixCharacters();">
+
+                <div class="card-body ">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center experience">
+                                <h3 style="font-size: 18px">Ecrire un commentaire</h3>
+                            </div>
+
+                            <input id="x" value="" type="hidden" name="content" required="required" minlength="20">
+                            <trix-editor input="x"></trix-editor>
+                            <input name="subjectId" type="number" hidden="hidden" value="{{ concernedSubject.id }}">
+                            <input type="submit" class="button transparent" value="Envoyer" style="width: 15%">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- footer -->
+{% include '/footer/footer.html.twig' %}
+
+<!-- javascript to make make an alert appear when clicking on a button -->
+<script src="../js/Subject/subject.js"></script>
+</body>
+</html>
